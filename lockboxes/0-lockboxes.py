@@ -1,26 +1,28 @@
 #!/usr/bin/python3
+"""Exercise to practice interview"""
+from itertools import dropwhile
+
 
 def canUnlockAll(boxes):
-    """ Determines if all boxes can be unlocked. """
-    opened_boxes = {0}
-    to_check = [0]
+    """Checks if all boxes can be unlocked"""
 
-    while to_check:
-        box = to_check.pop()
+    keys = {0}
+    range_boxes = range(len(boxes))
 
-        for key in boxes[box]:
-            if key not in opened_boxes and key < len(boxes):
-                opened_boxes.add(key)
-                to_check.append(key)
+    while True:
+        not_found = set()
 
-    return len(opened_boxes) == len(boxes)
+        for i in range_boxes:
+            if i in keys:
+                for key in dropwhile(lambda k: k in keys, boxes[i]):
+                    keys.add(key)
+            else:
+                not_found.add(i)
 
-if __name__ == "__main__":
-    boxes1 = [[1], [2], [3], [4], []]
-    print(canUnlockAll(boxes1))  # Beklenen çıktı: True
+        if range_boxes == not_found:
+            return False
 
-    boxes2 = [[1, 4, 6], [2], [0, 4, 1], [5, 6, 2], [3], [4, 1], [6]]
-    print(canUnlockAll(boxes2))  # Beklenen çıktı: True
+        if not not_found:
+            return True
 
-    boxes3 = [[1, 4], [2], [0, 4, 1], [3], [], [4, 1], [5, 6]]
-    print(canUnlockAll(boxes3))  # Beklenen çıktı: False
+        range_boxes = not_found
