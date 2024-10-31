@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 def canUnlockAll(boxes):
+    """ Determines if all boxes can be unlocked. """
     opened_boxes = {0}
     to_check = [0]
 
@@ -11,15 +12,15 @@ def canUnlockAll(boxes):
             if key not in opened_boxes and key < len(boxes):
                 opened_boxes.add(key)
                 to_check.append(key)
-                
+
     return len(opened_boxes) == len(boxes)
 
 if __name__ == "__main__":
     boxes1 = [[1], [2], [3], [4], []]
-    print(canUnlockAll(boxes1))
+    print(canUnlockAll(boxes1))  # Beklenen çıktı: True
 
     boxes2 = [[1, 4, 6], [2], [0, 4, 1], [5, 6, 2], [3], [4, 1], [6]]
-    print(canUnlockAll(boxes2))
+    print(canUnlockAll(boxes2))  # Beklenen çıktı: True
 
     boxes3 = [[1, 4], [2], [0, 4, 1], [3], [], [4, 1], [5, 6]]
-    print(canUnlockAll(boxes3))
+    print(canUnlockAll(boxes3))  # Beklenen çıktı: False
