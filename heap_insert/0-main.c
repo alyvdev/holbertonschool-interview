@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "binary_trees.h"
+
 /**
  * main - Entry point
  *
@@ -20,6 +21,5 @@ int main(void)
     root->right->right = binary_tree_node(root->right, 512);
 
     binary_tree_print(root);
-    _binary_tree_delete(root);
     return (0);
 }
