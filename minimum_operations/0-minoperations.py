@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 """
-This module provides a function `minOperations` that 
-calculates the minimum number of operations 
+This module provides a function `minOperations` that
+calculates the minimum number of operations
 needed to result in exactly n 'H' characters in a file.
-The operations include copying all characters 
+The operations include copying all characters
 and pasting them.
 """
+
+
 def minOperations(n):
     if n <= 1:
         return 0
@@ -17,5 +19,5 @@ def minOperations(n):
             operations += divions
             n = n / divions
         divions += 1
-    
+
     return operations
