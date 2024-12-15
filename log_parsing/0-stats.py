@@ -1,45 +1,48 @@
 #!/usr/bin/python3
+"""
+Reads from standard input and computes metrics
+"""
 import sys
 
+
+# Define valid status codes
+VALID_CODES = {200, 301, 400, 401, 403, 404, 405, 500}
+
 # Initialize variables
-codes = {}
-status_codes = ['200', '301', '400', '401', '403', '404', '405', '500']
-count = 0
-size = 0
+total_size = 0
+line_count = 0
+status_counts = {code: 0 for code in VALID_CODES}
 
+# Function to print statistics
+def print_stats():
+  global total_size, line_count, status_counts
+  print(f"Total file size: {total_size}")
+  print(f"Number of lines by status code:")
+  for code, count in sorted(status_counts.items()):
+    if count > 0:
+      print(f"{code}: {count}")
+  line_count = 0
+  status_counts = {code: 0 for code in VALID_CODES}  # Reset counters
 
-def print_statistics(size, codes):
-    print("File size: {}".format(size))
-    for key in sorted(codes):
-        print("{}: {}".format(key, codes[key]))
-
-
+# Main loop
 try:
-    for ln in sys.stdin:
-        if count == 10:
-            print_statistics(size, codes)
-            count = 1
-        else:
-            count += 1
+  for line in sys.stdin:
+    line = line.strip()  # Remove trailing newline
+    # Parse log entry
+    try:
+      ip, date, _, _, status_code, file_size = line.split()
+      file_size = int(file_size)
+      if status_code not in VALID_CODES:
+        continue  # Skip invalid status codes
+      total_size += file_size
+      status_counts[int(status_code)] += 1
+      line_count += 1
+    except ValueError:
+      continue  # Skip invalid lines
 
-        ln = ln.split()
-
-        try:
-            size = size + int(ln[-1])
-        except (IndexError, ValueError):
-            pass
-
-        try:
-            if ln[-2] in status_codes:
-                if ln[-2] not in codes:
-                    codes[ln[-2]] = 1
-                else:
-                    codes[ln[-2]] += 1
-        except IndexError:
-            pass
-
-    print_statistics(size, codes)
+    # Print stats every 10 lines or on keyboard interrupt
+    if line_count % 10 == 0 or line_count == 1:
+      print_stats()
 
 except KeyboardInterrupt:
-    print_statistics(size, codes)
-    raise
+  print_stats()
