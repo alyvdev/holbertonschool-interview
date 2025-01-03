@@ -1,38 +1,57 @@
 #!/usr/bin/python3
-"""Script"""
+"""Log parsing script"""
 
 import sys
-from collections import OrderedDict
-import re
 
-def grep(pattern, line):
-    """Helper function to find pattern in line"""
-    return re.search(pattern, line)
 
-def print_log(size, codes):
-    """Print statistics for file size and status codes"""
-    print("File size: {}".format(size))
-    for k, v in codes.items():
-        if k and v:
-            print("{}: {}".format(k, v))
+def print_stats(total_size, status_codes):
+    """
+    Print the accumulated metrics.
+    """
+    print("File size: {}".format(total_size))
+    for code in sorted(status_codes):
+        if status_codes[code] > 0:
+            print("{}: {}".format(code, status_codes[code]))
+
 
 def main():
-    """Main function to process log input"""
-    line_count = total_size = 0
-    CODES = [200, 301, 400, 401, 403, 404, 405, 500, None]
-    codes = OrderedDict((k, 0) for k in CODES)
+    """
+    Process stdin line by line and compute metrics.
+    """
+    total_size = 0
+    status_codes = {200: 0, 301: 0, 400: 0,
+                    401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
+    line_count = 0
+
     try:
         for line in sys.stdin:
-            status, size = grep(" \d{3} ", line), grep("\d{1,4}$", line)
-            status = int(status.group()) if status else None
-            codes[status] += 1
-            total_size += int(size.group()) if size else 0
+            line = line.strip()
+            parts = line.split()
+            if len(parts) < 9:
+                continue
+
+            try:
+                # Parse file size
+                file_size = int(parts[-1])
+                total_size += file_size
+
+                # Parse status code
+                status_code = int(parts[-2])
+                if status_code in status_codes:
+                    status_codes[status_code] += 1
+            except ValueError:
+                continue
+
             line_count += 1
             if line_count % 10 == 0:
-                print_log(total_size, codes)
-        print_log(total_size, codes)
+                print_stats(total_size, status_codes)
+
     except KeyboardInterrupt:
-        print_log(total_size, codes)
+        print_stats(total_size, status_codes)
+        raise
+
+    print_stats(total_size, status_codes)
+
 
 if __name__ == "__main__":
     main()
