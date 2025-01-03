@@ -4,16 +4,16 @@
 """
 import sys
 
-
 def print_msg(codes, file_size):
+    """
+        print the message
+    """
     print("File size: {}".format(file_size))
     for key, val in sorted(codes.items()):
         if val != 0:
             print("{}: {}".format(key, val))
 
-
 file_size = 0
-code = 0
 count_lines = 0
 codes = {
     "200": 0,
@@ -28,22 +28,20 @@ codes = {
 
 try:
     for line in sys.stdin:
-        parsed_line = line.split()
-        parsed_line = parsed_line[::-1]
-
-        if len(parsed_line) > 2:
-            count_lines += 1
-
-            if count_lines <= 10:
-                file_size += int(parsed_line[0])
-                code = parsed_line[1]
-
-                if (code in codes.keys()):
+        try:
+            parsed_line = line.split()
+            if len(parsed_line) >= 2:
+                count_lines += 1
+                file_size += int(parsed_line[-1])
+                code = parsed_line[-2]
+                if code in codes:
                     codes[code] += 1
-
-            if (count_lines == 10):
-                print_msg(codes, file_size)
-                count_lines = 0
-
+                if count_lines == 10:
+                    print_msg(codes, file_size)
+                    count_lines = 0
+        except (IndexError, ValueError):
+            continue
+except KeyboardInterrupt:
+    pass
 finally:
     print_msg(codes, file_size)
