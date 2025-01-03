@@ -1,44 +1,49 @@
 #!/usr/bin/python3
-"""Script that reads stdin line by line and computes metrics"""
+"""
+    script that reads stdin line by line and computes metrics
+"""
+import sys
 
-from sys import stdin
 
-VALID_CODES = [200, 301, 400, 401, 403, 404, 405, 500]
+def print_msg(codes, file_size):
+    print("File size: {}".format(file_size))
+    for key, val in sorted(codes.items()):
+        if val != 0:
+            print("{}: {}".format(key, val))
 
-def print_stats():
-    """Print accumulated statistics"""
-    print(f"File size: {total_size}")
-    for code in sorted(status_counts.keys()):
-        if status_counts[code] > 0:
-            print(f"{code}: {status_counts[code]}")
 
-# Initialize metrics
-total_size = 0
-line_count = 0
-status_counts = {code: 0 for code in VALID_CODES}
+file_size = 0
+code = 0
+count_lines = 0
+codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
 
 try:
-    for line in stdin:
-        line = line.strip()
-        try:
-            parts = line.split()
-            if len(parts) < 2:
-                continue
-                
-            status_code = int(parts[-2])
-            file_size = int(parts[-1])
-            
-            if status_code in VALID_CODES:
-                status_counts[status_code] += 1
-            total_size += file_size
-            line_count += 1
+    for line in sys.stdin:
+        parsed_line = line.split()
+        parsed_line = parsed_line[::-1]
 
-            if line_count % 10 == 0:
-                print_stats()
-        except (ValueError, IndexError):
-            continue
+        if len(parsed_line) > 2:
+            count_lines += 1
 
-except KeyboardInterrupt:
-    print_stats()
+            if count_lines <= 10:
+                file_size += int(parsed_line[0])
+                code = parsed_line[1]
+
+                if (code in codes.keys()):
+                    codes[code] += 1
+
+            if (count_lines == 10):
+                print_msg(codes, file_size)
+                count_lines = 0
+
 finally:
-    print_stats()
+    print_msg(codes, file_size)
