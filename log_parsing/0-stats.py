@@ -15,6 +15,7 @@ status_counts = {code: 0 for code in VALID_CODES}
 
 # Function to print statistics
 def print_stats():
+  """Print statistics for the log data processed so far"""
   global total_size, line_count, status_counts
   print(f"Total file size: {total_size}")
   print(f"Number of lines by status code:")
