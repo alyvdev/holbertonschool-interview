@@ -12,81 +12,93 @@ int slide_line(int *line, size_t size, int direction)
 {
     size_t i, j, k;
     int temp[32] = {0};  /* Assuming max size of 32 as per problem constraints */
-    int *working_line;
-    int increment;
-    size_t start, end;
-
+    
     /* Validate direction */
     if (direction != SLIDE_LEFT && direction != SLIDE_RIGHT)
         return (0);
 
-    /* Set up direction-specific parameters */
     if (direction == SLIDE_LEFT)
     {
-        increment = 1;
-        start = 0;
-        end = size;
-        working_line = line;
+        /* Slide and merge to the left */
+        k = 0;
+        for (i = 0; i < size; i++)
+        {
+            if (line[i] == 0)
+                continue;
+
+            /* Look for merge candidates */
+            for (j = i + 1; j < size; j++)
+            {
+                if (line[j] == 0)
+                    continue;
+                
+                if (line[i] == line[j])
+                {
+                    line[i] *= 2;
+                    line[j] = 0;
+                    break;
+                }
+                break;
+            }
+        }
+
+        /* Compact the array */
+        k = 0;
+        for (i = 0; i < size; i++)
+        {
+            if (line[i] != 0)
+                temp[k++] = line[i];
+        }
+
+        /* Zero-fill the remaining */
+        for (i = k; i < size; i++)
+            temp[i] = 0;
+
+        /* Copy back to original array */
+        for (i = 0; i < size; i++)
+            line[i] = temp[i];
     }
     else /* SLIDE_RIGHT */
     {
-        increment = -1;
-        start = size - 1;
-        end = (size_t)-1;  // Use max size_t to avoid signed comparison
-        working_line = line + size - 1;
-    }
-
-    /* Slide and merge */
-    k = 0;
-    while (start != end)
-    {
-        if (working_line[0] != 0)
+        /* Slide and merge to the right */
+        k = 0;
+        for (i = size; i-- > 0;)
         {
-            /* Look for next non-zero number to merge */
-            for (j = 1; j < size; j++)
-            {
-                if (direction == SLIDE_LEFT)
-                {
-                    if (line[start + j] != 0)
-                    {
-                        if (working_line[0] == line[start + j])
-                        {
-                            working_line[0] *= 2;
-                            line[start + j] = 0;
-                            break;
-                        }
-                        else
-                            break;
-                    }
-                }
-                else /* SLIDE_RIGHT */
-                {
-                    if (line[start - j] != 0)
-                    {
-                        if (working_line[0] == line[start - j])
-                        {
-                            working_line[0] *= 2;
-                            line[start - j] = 0;
-                            break;
-                        }
-                        else
-                            break;
-                    }
-                }
-            }
+            if (line[i] == 0)
+                continue;
 
-            /* Move non-zero number to temp array */
-            temp[k++] = working_line[0];
+            /* Look for merge candidates */
+            for (j = i; j-- > 0;)
+            {
+                if (line[j] == 0)
+                    continue;
+                
+                if (line[i] == line[j])
+                {
+                    line[i] *= 2;
+                    line[j] = 0;
+                    break;
+                }
+                break;
+            }
         }
 
-        /* Move to next element */
-        start += increment;
-        working_line += increment;
-    }
+        /* Compact the array */
+        k = 0;
+        for (i = size; i-- > 0;)
+        {
+            if (line[i] != 0)
+                temp[k++] = line[i];
+        }
 
-    /* Copy temp array back to original line */
-    for (i = 0; i < size; i++)
-        line[i] = temp[i];
+        /* Reverse the compacted array */
+        for (i = 0; i < k; i++)
+            line[size - 1 - i] = temp[i];
+        
+        /* Zero-fill the remaining */
+        for (i = k; i < size; i++)
+            line[size - 1 - i + k] = 0;
+    }
 
     return (1);
 }
