@@ -38,7 +38,8 @@ int slide_line(int *line, size_t size, int direction)
                     line[j] = 0;
                     break;
                 }
-                break;
+                else
+                    break; /* Important: If not equal, stop looking for merge */
             }
         }
 
@@ -61,14 +62,14 @@ int slide_line(int *line, size_t size, int direction)
     else /* SLIDE_RIGHT */
     {
         /* Slide and merge to the right */
-        k = 0;
-        for (i = size; i-- > 0;)
+        
+         for (i = size - 1; i > 0; i--)
         {
             if (line[i] == 0)
                 continue;
 
             /* Look for merge candidates */
-            for (j = i; j-- > 0;)
+            for (j = i - 1; j >= 0; j--)
             {
                 if (line[j] == 0)
                     continue;
@@ -79,25 +80,27 @@ int slide_line(int *line, size_t size, int direction)
                     line[j] = 0;
                     break;
                 }
-                break;
+                else
+                    break; /* Important: If not equal, stop looking for merge */
             }
         }
 
         /* Compact the array */
         k = 0;
-        for (i = size; i-- > 0;)
+        for (i = size - 1; i >= 0; i--)
         {
             if (line[i] != 0)
                 temp[k++] = line[i];
         }
 
-        /* Reverse the compacted array */
+         /* Reverse the compacted array and copy back to original array */
         for (i = 0; i < k; i++)
-            line[size - 1 - i] = temp[i];
-        
+             line[size - 1 - i] = temp[i];
+
         /* Zero-fill the remaining */
         for (i = k; i < size; i++)
-            line[size - 1 - i + k] = 0;
+            line[size - 1 - i] = 0;
+        
     }
 
     return (1);
