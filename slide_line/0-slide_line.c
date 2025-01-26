@@ -1,107 +1,108 @@
 #include "slide_line.h"
 
 /**
- * slide_line - Slides and merges an array of integers
- * @line: Pointer to the array of integers
- * @size: Number of elements in the array
- * @direction: Direction to slide (SLIDE_LEFT or SLIDE_RIGHT)
+ * slide_line - slides an array to left or right to sum numbers
  *
- * Return: 1 on success, 0 on failure
+ * @line: line of numbers to be checked
+ * @size: size of array
+ * @direction: left or right
+ * Return: 1 if is possible or 0 if it's not possible
  */
+
 int slide_line(int *line, size_t size, int direction)
 {
-    size_t i, j, k;
-    int temp[32] = {0};  /* Assuming max size of 32 as per problem constraints */
-    
-    /* Validate direction */
-    if (direction != SLIDE_LEFT && direction != SLIDE_RIGHT)
-        return (0);
+	if (direction == 2)
+		return (to_left(line, size));
+	if (direction == 1)
+		return (to_right(line, size));
+	else
+		return (0);
+}
 
-    if (direction == SLIDE_LEFT)
-    {
-        /* Slide and merge to the left */
-        k = 0;
-        for (i = 0; i < size; i++)
-        {
-            if (line[i] == 0)
-                continue;
+/**
+ * to_left - slide to the left to sum
+ *
+ * @line: line of numbers to be checked
+ * @size: size of array
+ * Return: 1 on success
+ */
 
-            /* Look for merge candidates */
-            for (j = i + 1; j < size; j++)
-            {
-                if (line[j] == 0)
-                    continue;
-                
-                if (line[i] == line[j])
-                {
-                    line[i] *= 2;
-                    line[j] = 0;
-                    break;
-                }
-                else
-                    break; /* Important: If not equal, stop looking for merge */
-            }
-        }
+int to_left(int *line, size_t size)
+{
+	int cur = 0, nxt = 0;
+	size_t i, index = 0;
 
-        /* Compact the array */
-        k = 0;
-        for (i = 0; i < size; i++)
-        {
-            if (line[i] != 0)
-                temp[k++] = line[i];
-        }
+	for (i = 0; i < size; i++)
+	{
+		if (line[i] != 0 && cur == 0)
+			cur = line[i];
+		else if (cur != 0 && line[i] != 0)
+			nxt = line[i];
+		if (cur != 0 && nxt != 0)
+		{
+			if (cur == nxt)
+			{
+				line[index++] = cur + nxt;
+				cur = 0;
+				nxt = 0;
+			}
+			else
+			{
+				line[index++] = cur;
+				cur = nxt;
+				nxt = 0;
+				if (i == size - 1)
+					line[index++] = cur;
+			}
+		}
+		if (cur != nxt && i == size - 1)
+			line[index++] = cur;
+	}
+	for (i = index; i < size; i++)
+		line[i] = 0;
+	return (1);
+}
 
-        /* Zero-fill the remaining */
-        for (i = k; i < size; i++)
-            temp[i] = 0;
+/**
+ * to_right - slides an array to sum numbers
+ *
+ * @line: line of numbers to be checked
+ * @size: size of array
+ * Return: 1 on success
+ */
 
-        /* Copy back to original array */
-        for (i = 0; i < size; i++)
-            line[i] = temp[i];
-    }
-    else /* SLIDE_RIGHT */
-    {
-        /* Slide and merge to the right */
-        
-         for (i = size - 1; i > 0; i--)
-        {
-            if (line[i] == 0)
-                continue;
+int to_right(int *line, size_t size)
+{
+	int cur = 0, previous = 0;
+	size_t i, index = size - 1;
 
-            /* Look for merge candidates */
-            for (j = i - 1; j >= 0; j--)
-            {
-                if (line[j] == 0)
-                    continue;
-                
-                if (line[i] == line[j])
-                {
-                    line[i] *= 2;
-                    line[j] = 0;
-                    break;
-                }
-                else
-                    break; /* Important: If not equal, stop looking for merge */
-            }
-        }
-
-        /* Compact the array */
-        k = 0;
-        for (i = size - 1; i >= 0; i--)
-        {
-            if (line[i] != 0)
-                temp[k++] = line[i];
-        }
-
-         /* Reverse the compacted array and copy back to original array */
-        for (i = 0; i < k; i++)
-             line[size - 1 - i] = temp[i];
-
-        /* Zero-fill the remaining */
-        for (i = k; i < size; i++)
-            line[size - 1 - i] = 0;
-        
-    }
-
-    return (1);
+	for (i = size - 1; i < size; i--)
+	{
+		if (line[i] != 0 && cur == 0)
+			cur = line[i];
+		else if (cur != 0 && line[i] != 0)
+			previous = line[i];
+		if (cur != 0 && previous != 0)
+		{
+			if (cur == previous)
+			{
+				line[index--] = cur + previous;
+				cur = 0;
+				previous = 0;
+			}
+			else
+			{
+				line[index--] = cur;
+				cur = previous;
+				previous = 0;
+				if (i == 0)
+					line[index--] = cur;
+			}
+		}
+		else if (cur != previous && i == 0)
+			line[index--] = cur;
+	}
+	for (i = 0; i < index + 1; i++)
+		line[i] = 0;
+	return (1);
 }
