@@ -30,9 +30,9 @@ avl_t *create_avl_node(int value, avl_t *parent)
  * @parent: Parent node of the current subtree
  * Return: Pointer to the root of the created AVL tree, or NULL on failure
  */
-avl_t *build_avl(int *array, size_t start, size_t end, avl_t *parent)
+avl_t *build_avl(int *array, int start, int end, avl_t *parent)
 {
-	size_t mid;
+	int mid;
 	avl_t *root;
 
 	if (start > end)
@@ -60,5 +60,5 @@ avl_t *sorted_array_to_avl(int *array, size_t size)
 	if (!array || size == 0)
 		return (NULL);
 
-	return (build_avl(array, 0, size - 1, NULL));
+	return (build_avl(array, 0, (int)size - 1, NULL));
 }
